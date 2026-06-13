@@ -4,6 +4,7 @@
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('[INIT] DOMContentLoaded event fired');
   /* ----------------------------------------------------------
      0. GLOBAL CONSTANTS & HELPERS
   ---------------------------------------------------------- */
@@ -542,6 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitButton = qs('#submit-btn', contactForm);
     const submitButtonText = submitButton ? submitButton.querySelector('.btn-text') : null;
 
+    console.log('[FORM] Attaching submit listener');
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       console.log('[FORM] Submit started');
