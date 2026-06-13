@@ -22,9 +22,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const EMAILJS_TEMPLATE_ID = 'template_7djjb7h';
   const EMAILJS_USER_ID = 'IraKUIfFfz2Croa4Y';
 
-  if (window.emailjs && typeof window.emailjs.init === 'function') {
-    window.emailjs.init(EMAILJS_USER_ID);
-  }
+  const EMAILJS_CDN = 'https://cdn.emailjs.com/sdk/3.2.0/email.min.js';
+
+  const loadEmailJSScript = () => new Promise((resolve, reject) => {
+    if (window.emailjs && typeof window.emailjs.init === 'function') {
+      try { window.emailjs.init(EMAILJS_USER_ID); } catch (e) {}
+      return resolve();
+    }
+
+    const existing = Array.from(document.getElementsByTagName('script')).find(s => s.src && s.src.includes('cdn.emailjs.com'));
+    if (existing) {
+      existing.addEventListener('load', () => {
+        try { window.emailjs.init(EMAILJS_USER_ID); } catch (e) {}
+        resolve();
+      });
+      existing.addEventListener('error', () => reject(new Error('EmailJS script failed to load')));
+      return;
+    }
+
+    const s = document.createElement('script');
+    s.src = EMAILJS_CDN;
+    s.async = true;
+    s.onload = () => {
+      try { window.emailjs.init(EMAILJS_USER_ID); } catch (e) {}
+      resolve();
+    };
+    s.onerror = () => reject(new Error('EmailJS script failed to load'));
+    document.head.appendChild(s);
+  });
 
   /* ==========================================================
      1. SMOOTH SCROLL NAVIGATION
@@ -516,6 +541,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
+        if (!window.emailjs || typeof window.emailjs.sendForm !== 'function') {
+          try {
+            await loadEmailJSScript();
+          } catch (loadErr) {
+            console.error('EmailJS load error:', loadErr);
+            showToast('Unable to send message. Email service unavailable — please email sandeshgiri736@gmail.com', 7000);
+            return;
+          }
+        }
+
         await window.emailjs.sendForm(
           EMAILJS_SERVICE_ID,
           EMAILJS_TEMPLATE_ID,
