@@ -544,30 +544,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      console.log('[FORM] Submit started');
 
       let isValid = true;
       Object.keys(fields).forEach((key) => {
         if (!validateField(key)) isValid = false;
       });
 
-      if (!isValid) return;
+      if (!isValid) {
+        console.log('[FORM] Validation failed');
+        return;
+      }
 
       if (submitButton) {
         submitButton.disabled = true;
         if (submitButtonText) submitButtonText.textContent = 'Sending...';
       }
+      console.log('[FORM] Button set to Sending...');
 
       try {
+        console.log('[FORM] Checking if emailjs loaded:', !!window.emailjs);
         if (!window.emailjs || typeof window.emailjs.sendForm !== 'function') {
+          console.log('[FORM] Loading EmailJS...');
           await loadEmailJSScript();
+          console.log('[FORM] EmailJS loaded successfully');
         }
 
+        console.log('[FORM] Sending email...');
         await window.emailjs.sendForm(
           EMAILJS_SERVICE_ID,
           EMAILJS_TEMPLATE_ID,
           contactForm
         );
 
+        console.log('[FORM] Email sent successfully');
         showToast('Message sent successfully! I\'ll get back to you soon. 🚀');
         contactForm.reset();
         Object.values(fields).forEach(({ el }) => {
@@ -577,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
       } catch (error) {
-        console.error('ContactForm submission error:', error);
+        console.error('[FORM] Submission error:', error);
         const errorMsg = error?.message || 'Unknown error';
         if (errorMsg.includes('timeout')) {
           showToast('Email service unavailable. Please contact: sandeshgiri736@gmail.com', 7000);
@@ -585,10 +595,12 @@ document.addEventListener('DOMContentLoaded', () => {
           showToast('Unable to send message. Please try again later.', 5000);
         }
       } finally {
+        console.log('[FORM] Finally block executing');
         if (submitButton) {
           submitButton.disabled = false;
           if (submitButtonText) submitButtonText.textContent = 'Send Message';
         }
+        console.log('[FORM] Form submit complete');
       }
     });
   }
