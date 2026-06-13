@@ -423,14 +423,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (contactForm) {
     const fields = {
       name: {
-        el: qs('input[name="name"], #name', contactForm),
+        el: qs('input[name="name"], #form-name', contactForm),
         rules: [
           { test: (v) => v.trim().length > 0, msg: 'Name is required.' },
           { test: (v) => v.trim().length >= 2, msg: 'Name must be at least 2 characters.' },
         ],
       },
       email: {
-        el: qs('input[name="email"], #email', contactForm),
+        el: qs('input[name="email"], #form-email', contactForm),
         rules: [
           { test: (v) => v.trim().length > 0, msg: 'Email is required.' },
           {
@@ -440,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ],
       },
       message: {
-        el: qs('textarea[name="message"], #message', contactForm),
+        el: qs('textarea[name="message"], #form-message', contactForm),
         rules: [
           { test: (v) => v.trim().length > 0, msg: 'Message is required.' },
           { test: (v) => v.trim().length >= 10, msg: 'Message must be at least 10 characters.' },
