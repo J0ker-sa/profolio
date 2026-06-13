@@ -559,13 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         if (!window.emailjs || typeof window.emailjs.sendForm !== 'function') {
-          try {
-            await loadEmailJSScript();
-          } catch (loadErr) {
-            console.error('EmailJS load error:', loadErr);
-            showToast('Unable to send message. Email service unavailable — please email sandeshgiri736@gmail.com', 7000);
-            return;
-          }
+          await loadEmailJSScript();
         }
 
         await window.emailjs.sendForm(
@@ -583,8 +577,13 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
       } catch (error) {
-        console.error('EmailJS error:', error);
-        showToast('Unable to send message. Please try again later.', 5000);
+        console.error('ContactForm submission error:', error);
+        const errorMsg = error?.message || 'Unknown error';
+        if (errorMsg.includes('timeout')) {
+          showToast('Email service unavailable. Please contact: sandeshgiri736@gmail.com', 7000);
+        } else {
+          showToast('Unable to send message. Please try again later.', 5000);
+        }
       } finally {
         if (submitButton) {
           submitButton.disabled = false;
