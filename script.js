@@ -32,10 +32,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const existing = Array.from(document.getElementsByTagName('script')).find(s => s.src && s.src.includes('cdn.emailjs.com'));
     if (existing) {
-      existing.addEventListener('load', () => {
+      const handleLoaded = () => {
         try { window.emailjs.init(EMAILJS_USER_ID); } catch (e) {}
-        resolve();
-      });
+        if (window.emailjs && typeof window.emailjs.init === 'function') {
+          resolve();
+        } else {
+          reject(new Error('EmailJS script loaded but emailjs global is not available'));
+        }
+      };
+
+      if (existing.readyState === 'complete' || existing.readyState === 'loaded' || existing.complete) {
+        handleLoaded();
+        return;
+      }
+
+      existing.addEventListener('load', handleLoaded);
       existing.addEventListener('error', () => reject(new Error('EmailJS script failed to load')));
       return;
     }
