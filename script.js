@@ -46,19 +46,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      existing.addEventListener('load', handleLoaded);
-      existing.addEventListener('error', () => reject(new Error('EmailJS script failed to load')));
+      const timer = setTimeout(() => reject(new Error('EmailJS script load timeout')), 5000);
+      existing.addEventListener('load', () => { clearTimeout(timer); handleLoaded(); });
+      existing.addEventListener('error', () => { clearTimeout(timer); reject(new Error('EmailJS script failed to load')); });
       return;
     }
 
+    const timer = setTimeout(() => reject(new Error('EmailJS script load timeout')), 5000);
     const s = document.createElement('script');
     s.src = EMAILJS_CDN;
     s.async = true;
     s.onload = () => {
+      clearTimeout(timer);
       try { window.emailjs.init(EMAILJS_USER_ID); } catch (e) {}
       resolve();
     };
-    s.onerror = () => reject(new Error('EmailJS script failed to load'));
+    s.onerror = () => {
+      clearTimeout(timer);
+      reject(new Error('EmailJS script failed to load'));
+    };
     document.head.appendChild(s);
   });
 
